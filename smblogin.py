@@ -62,15 +62,15 @@ class Logon ():
 
     def Submit(self):
         self.lab1["text"] = ""
-        user = self.ent1.get()
+        user = self.ent1.get().encode('gbk')
         password = self.ent2.get()
         encryp_pass=base64.encodestring(password)
         ip = self.ent3.get()
-        share = self.ent4.get()
+        share = self.ent4.get().encode('gbk')
         if not user or not password or not ip or not share:
             self.lab1["text"] = "信息不能为空"
             return 1
-        cmd_add = r"net use * \\"+ip+"\\"+share+" "+password+" /user:"+user
+        cmd_add = "net use * \\\\"+ip+"\\"+share+" "+password+" /user:"+user
         exe_result=subprocess.Popen(cmd_add, shell=True)
         t=0
         self.lab1["text"] = str(exe_result.pid)
@@ -101,10 +101,9 @@ class Logon ():
                 self.putbox()
                 with open(confile, "r") as f:
                     lines = f.readlines()
-                    # print(lines)
                 with open(confile, "w") as f_w:
                     for line in lines:
-                        if ip in line and share in line:
+                        if ip in line.decode('gbk') and share in line.decode('gbk'):
                             continue
                         f_w.write(line)
 
@@ -144,7 +143,7 @@ class Logon ():
                         if len(each['path'].split('\\')) ==4:
                             exsit_ip = each['path'].split('\\')[2]
                             exsit_share = each['path'].split('\\')[3]
-                            if share ==exsit_share and ip == exsit_ip:
+                            if share.decode('gbk').encode('utf-8') ==exsit_share and ip == exsit_ip:
                                 num=1
                 if num ==0:
                     cmd_add = r"net use * \\" + ip + "\\" + share + " " + password + " /user:" + user
@@ -159,13 +158,12 @@ class Logon ():
 
     def getshare(self):
         cmd_get = "net use"
-        cmd_result=os.popen(cmd_get).read()
+        cmd_result=os.popen(cmd_get).read().decode('gbk').encode('utf-8')
         share_list=[]
         for line in cmd_result.split('\n'):
             eachline=line.split()
             if len(eachline) == 6 and eachline[3]=="Microsoft":
                 share = {'driver':eachline[1],'status':eachline[0],'path':eachline[2]}
-                # print share
                 share_list.append(share)
         result = share_list
         return result
