@@ -95,7 +95,7 @@ class Logon ():
             path = self.box.get().split()[1]
             ip =path.split('\\')[2]
             share =path.split('\\')[3]
-            cmd_del = "net use "+device+" /del "
+            cmd_del = "net use "+device+" /del /y"
             exe_result = subprocess.call(cmd_del,shell=True)
             if exe_result == 0:
                 self.putbox()
@@ -130,7 +130,6 @@ class Logon ():
         with open(confile, 'r') as f1:
             for lines in f1.readlines():
                 line =lines.rstrip('\n')
-                num =0
                 if len(line.split('##')) !=4:
                     continue
                 user=line.split('##')[0]
@@ -143,16 +142,17 @@ class Logon ():
                         if len(each['path'].split('\\')) ==4:
                             exsit_ip = each['path'].split('\\')[2]
                             exsit_share = each['path'].split('\\')[3]
+                            exsit_driver = each['driver']
                             if share.decode('gbk').encode('utf-8') ==exsit_share and ip == exsit_ip:
-                                num=1
-                if num ==0:
-                    cmd_add = r"net use * \\" + ip + "\\" + share + " " + password + " /user:" + user
-                    exe_result = subprocess.Popen(cmd_add, shell=True)
-                    t = 0
-                    while (t < 2) and (exe_result.poll() is None):
-                        t += 1;
-                        time.sleep(1);
-                    exe_result.kill()
+                                del_cmd = r"net use " + exsit_driver + " /del /y"
+                                del_result = subprocess.Popen(del_cmd, shell=True)
+                cmd_add = r"net use * \\" + ip + "\\" + share + " " + password + " /user:" + user
+                exe_result = subprocess.Popen(cmd_add, shell=True)
+                t = 0
+                while (t < 2) and (exe_result.poll() is None):
+                    t += 1;
+                    time.sleep(1);
+                exe_result.kill()
         self.lab1["text"] = "加载完成"
         self.putbox()
 
