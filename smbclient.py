@@ -12,6 +12,7 @@ confile=conpath+r"\conf.ini"
 if not os.path.isfile(confile):
     try:
         file = open(confile, 'w')
+        file.write("sleeptime5\n")
     finally:
         if file:
             file.close()

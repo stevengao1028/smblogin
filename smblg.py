@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 import subprocess,os
 import base64
+import time
+import sys
 
 conpath=os.getcwd()
 confile=conpath+r"\conf.ini"
 if not os.path.isfile(confile):
     try:
         file = open(confile, 'w')
+        file.write("sleeptime5\n")
     finally:
         if file:
             file.close()
@@ -62,5 +65,11 @@ def getshare():
 
 
 if __name__ == "__main__":
+    with open(confile, 'r') as f1:
+        for lines in f1.readlines():
+            line = lines.rstrip('\n')
+            if "sleeptime" in line:
+                sleeptime = int(line.lstrip("sleeptime"))
+    time.sleep(sleeptime)
     loadconf()
-
+    sys.exit()
